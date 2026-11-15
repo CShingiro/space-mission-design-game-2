@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://c6pvidt1ybxyl"]
+
+[ext_resource type="Script" uid="uid://bmg75sd577gj5" path="res://scripts/DesignScreen.gd" id="1_6xhbu"]
+
+[node name="DesignScreen" type="Control" unique_id=2007706260]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_6xhbu")

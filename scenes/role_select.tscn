@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://cn5yyjlq650q5"]
+
+[ext_resource type="Script" uid="uid://h6t3at18mh3s" path="res://scripts/RoleSelect.gd" id="1_u12go"]
+
+[node name="RoleSelect" type="Control" unique_id=713179866]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_u12go")
