@@ -1,5 +1,11 @@
 class_name GameOrbits
 const ORBITS = {
-	"leo": {"id": "leo", "name": "Low Earth Orbit", "launch_factor": 1.0, "sun_fraction": 0.62, "eclipse_hours": 0.6, "rate_factor": 1.0, "radiation": 0.0005, "deep_space": false, "needs_propulsion": "none"},
-	"iss": {"id": "iss", "name": "Space station orbit", "launch_factor": 0.9, "sun_fraction": 0.62, "eclipse_hours": 0.6, "rate_factor": 1.0, "radiation": 0.0005, "deep_space": false, "needs_propulsion": "small"}
+	"leo": {"id": "leo", "name": "Low Earth Orbit (500 km)", "launch_factor": 1.0, "sun_fraction": 0.62, "eclipse_hours": 0.6, "rate_factor": 1.0, "radiation": 0.0005, "deep_space": false, "needs_propulsion": "none"},
+	"sso": {"id": "sso", "name": "Sun-synchronous orbit (700 km)", "launch_factor": 0.85, "sun_fraction": 0.75, "eclipse_hours": 0.5, "rate_factor": 1.0, "radiation": 0.0007, "deep_space": false, "needs_propulsion": "none"},
+	"geo": {"id": "geo", "name": "Geostationary orbit (35,786 km)", "launch_factor": 0.35, "sun_fraction": 0.99, "eclipse_hours": 1.2, "rate_factor": 0.5, "radiation": 0.0015, "deep_space": false, "needs_propulsion": "chemical", "continuous_contact": true, "magnetorquers_work": false},
+	"l2": {"id": "l2", "name": "Sun-Earth L2 point", "launch_factor": 0.3, "sun_fraction": 1.0, "eclipse_hours": 0, "rate_factor": 0.15, "radiation": 0.001, "deep_space": true, "needs_propulsion": "chemical", "travel_months": 1, "magnetorquers_work": false},
+	"mars": {"id": "mars", "name": "Mars orbit", "launch_factor": 0.2, "sun_fraction": 0.43, "eclipse_hours": 0.7, "rate_factor": 0.02, "radiation": 0.002, "deep_space": true, "needs_propulsion": "chemical", "travel_months": 7, "magnetorquers_work": false},
+	"iss": {"id": "iss", "name": "Space station orbit (400 km)", "launch_factor": 0.9, "sun_fraction": 0.62, "eclipse_hours": 0.6, "rate_factor": 1.0, "radiation": 0.0005, "deep_space": false, "needs_propulsion": "small", "continuous_contact": true, "magnetorquers_work": true},
+	"moon_orbit": {"id": "moon_orbit", "name": "Lunar orbit (100 km)", "launch_factor": 0.3, "sun_fraction": 0.8, "eclipse_hours": 0.8, "rate_factor": 0.3, "radiation": 0.001, "deep_space": true, "needs_propulsion": "chemical", "travel_months": 1, "magnetorquers_work": false},
+	"moon_surface": {"id": "moon_surface", "name": "Lunar surface (south pole lander)", "launch_factor": 0.3, "sun_fraction": 0.5, "eclipse_hours": 336, "rate_factor": 0.3, "radiation": 0.001, "deep_space": true, "needs_propulsion": "lander", "travel_months": 1, "magnetorquers_work": false, "landing_risk": 0.25, "surface_science_bonus": 3}
 }
