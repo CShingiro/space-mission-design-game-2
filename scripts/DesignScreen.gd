@@ -27,10 +27,11 @@ func _ready():
 	# Background Image
 	var bg = TextureRect.new()
 	bg.texture = load("res://assets/images/bg_planets.png")
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	bg.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+	bg.expand_mode = TextureRect.EXPAND_KEEP_SIZE
 	add_child(bg)
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.modulate = Color(0.5, 0.5, 0.5)
 	
 	# Dark overlay
 	var overlay = ColorRect.new()

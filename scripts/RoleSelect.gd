@@ -11,11 +11,11 @@ func _ready():
 	# 1. Background (full screen)
 	var bg = TextureRect.new()
 	bg.texture = load("res://assets/images/bg_planets.png")
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	bg.modulate = Color(0.5, 0.5, 0.5) # Darken it slightly so UI pops
+	bg.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+	bg.expand_mode = TextureRect.EXPAND_KEEP_SIZE
 	add_child(bg)
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.modulate = Color(0.5, 0.5, 0.5) # Darken it slightly so UI pops
 	
 	# 2. Main Layout
 	var vbox = VBoxContainer.new()
