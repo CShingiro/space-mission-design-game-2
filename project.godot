@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Mission Control: Pure GDScript"
-run/main_scene="uid://bxd7g22taco78"
+run/main_scene="uid://bcuog4ki15hxv"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [autoload]

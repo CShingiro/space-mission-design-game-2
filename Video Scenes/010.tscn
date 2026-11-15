@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://bkwlst0btp2m4"]
+
+[ext_resource type="Script" uid="uid://elp7e2yb2mpj" path="res://scripts/OTHER VIEDOEOS.gd" id="1_l7tp4"]
+
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_5lt17"]
+file = "res://video files/VID-20261114-WA0010.ogv"
+
+[node name="010" type="VideoStreamPlayer" unique_id=1235443256]
+offset_right = 40.0
+offset_bottom = 40.0
+stream = SubResource("VideoStreamTheora_5lt17")
+autoplay = true
+script = ExtResource("1_l7tp4")
+
+[connection signal="finished" from="." to="." method="_on_finished"]

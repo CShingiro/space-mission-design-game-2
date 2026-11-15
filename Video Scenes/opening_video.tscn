@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://bcuog4ki15hxv"]
+
+[ext_resource type="Script" uid="uid://yf54oi2vy5ly" path="res://scripts/opening_video.gd" id="1_tg125"]
+
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_tg125"]
+resource_name = "opening"
+file = "res://video files/VID-20261114-WA0005.ogv"
+
+[node name="Opening Video" type="VideoStreamPlayer" unique_id=1739609617]
+offset_right = 1591.0
+offset_bottom = 898.0
+stream = SubResource("VideoStreamTheora_tg125")
+volume_db = 23.999994
+autoplay = true
+script = ExtResource("1_tg125")
+
+[node name="Button" type="Button" parent="." unique_id=1870982589]
+layout_mode = 0
+offset_left = 161.00018
+offset_top = 603.00006
+offset_right = 215.00018
+offset_bottom = 634.00006
+scale = Vector2(11.649599, 11.649599)
+text = "SKIP"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="." unique_id=756897604]
+layout_mode = 0
+offset_left = -19.0
+offset_top = 423.0
+offset_right = 990.0
+offset_bottom = 674.0
+theme_override_font_sizes/normal_font_size = 99
+bbcode_enabled = true
+text = "[rainbow freq=1.0 sat=0.8 val=0.8 speed=1.0]welcomew to our game[/rainbow]   "
+
+[connection signal="finished" from="." to="." method="_on_finished"]
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

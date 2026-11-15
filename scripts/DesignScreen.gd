@@ -332,6 +332,24 @@ func show_result(r: Dictionary):
 		t += "• " + line + "\n"
 	result_text.text = t
 	result_panel.visible = true
+	await get_tree().create_timer(1.0).timeout
+	# print(str(r.status) + "\n" + str(r.score) + "\n" + str(r.log))
+	print(mission_picker.get_selected_id())
+	if mission_picker.get_selected_id() == 1:
+		if str(r.status) == "success":
+			get_tree().change_scene_to_file("res://Video Scenes/006.tscn")
+		else:
+			get_tree().change_scene_to_file("res://Video Scenes/007.tscn")
+	elif mission_picker.get_selected_id() == 0:
+		if str(r.status) == "success":
+			get_tree().change_scene_to_file("res://Video Scenes/008.tscn")
+		else:
+			get_tree().change_scene_to_file("res://Video Scenes/009.tscn")
+	else:
+		if str(r.status) == "success":
+			get_tree().change_scene_to_file("res://Video Scenes/011.tscn")
+		else:
+			get_tree().change_scene_to_file("res://Video Scenes/010.tscn")
 
 func _get_picker_for_field(field_name: String) -> Control:
 	for child in left_panel.get_children():
