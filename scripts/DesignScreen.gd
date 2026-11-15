@@ -211,11 +211,7 @@ func _build_controls():
 			
 			# Safely find the current bus class
 			var current_bus_id = GameManager.current_design.get("bus", "")
-			var current_bus_class = "standard"
-			for b in GameParts.PARTS["bus"]:
-				if b.get("id") == current_bus_id:
-					current_bus_class = b.get("class", "standard")
-					break
+			var current_bus_class = _bus_part_class(GameManager.current_design.get("bus", ""))
 			
 			var is_crewed_mission = GameManager.current_design.get("mission", "") == "m_station"
 			
@@ -344,36 +340,52 @@ func _get_picker_for_field(field_name: String) -> Control:
 
 func _fix_incompatible_parts():
 	var new_bus_id = GameManager.current_design.get("bus", "")
-	var new_bus_class = "standard"
-	for b in GameParts.PARTS["bus"]:
-		if b["id"] == new_bus_id:
-			new_bus_class = b.get("class", "standard")
-			break
+	var current_bus_class = _bus_part_class(GameManager.current_design.get("bus", ""))
 	
-	# Auto-swap incompatible parts
-	var parts_to_check = ["power", "battery", "comms", "computer", "adcs", "propulsion", "instruments"]
+	# --- Instruments: filter to compatible, drop invalid ones ---
+	var current_instruments = GameManager.current_design.get("instruments", [])
+	var new_instruments: Array = []
+	for ins_id in current_instruments:
+		var ins_part = _find_part_in_list("instruments", str(ins_id))
+		if ins_part.is_empty():
+			continue
+		if ins_part.get("class", "standard") == current_bus_class:
+			new_instruments.append(ins_id)
+	if new_instruments.size() != current_instruments.size():
+		GameManager.update_design("instruments", new_instruments)
+	
+	# --- Scalar parts: swap to a compatible replacement if needed ---
+	var parts_to_check = ["power", "battery", "comms", "computer", "adcs", "propulsion"]
 	for field in parts_to_check:
-		var current_id = GameManager.current_design.get(field, "")
-		
-		if field == "instruments":
-			var new_instruments = []
-			for ins_id in current_id:
-				var ins_part = _find_part_in_list("instruments", ins_id)
-				if ins_part.get("class", "standard") == new_bus_class:
-					new_instruments.append(ins_id)
-			if new_instruments.size() != current_id.size():
-				GameManager.update_design("instruments", new_instruments)
-			else:
-				if current_id.ends_with("_none"):
-					continue # "None" is always valid, don't swap it
-				var part = _find_part_in_list(field, current_id)
-				if part.get("class", "standard") != new_bus_class:
-					# Find the first valid replacement
-					var list = GameParts.PARTS.get(field, [])
-					for p in list:
-						if p.get("class", "standard") == new_bus_class or p["id"].ends_with("_none"):
-							GameManager.update_design(field, p["id"])
-							break
+		var current_id = str(GameManager.current_design.get(field, ""))
+		if current_id.ends_with("_none"):
+			continue  # "None" is always valid
+		var part = _find_part_in_list(field, current_id)
+		if part.is_empty():
+			continue
+		if part.get("class", "standard") == current_bus_class:
+			continue
+		# Find a valid replacement
+		var list = GameParts.PARTS.get(field, [])
+		var replaced = false
+		for p in list:
+			if p.get("class", "standard") == current_bus_class:
+				GameManager.update_design(field, p["id"])
+				replaced = true
+				break
+		if not replaced:
+			# Fall back to the "none" option if available
+			for p in list:
+				if p["id"].ends_with("_none"):
+					GameManager.update_design(field, p["id"])
+					break
+func _bus_part_class(bus_id: String) -> String:
+	for b in GameParts.PARTS["bus"]:
+		if b.get("id") == bus_id:
+			var c = b.get("class", "standard")
+			return "standard" if c == "crewed" else c
+	return "standard"
+
 
 func _find_part_in_list(category: String, id: String) -> Dictionary:
 	for p in GameParts.PARTS.get(category, []):
@@ -393,11 +405,7 @@ func _rebuild_dropdowns_only():
 			else: 
 				var full_list = GameParts.PARTS.get(field, [])
 				var current_bus_id = GameManager.current_design.get("bus", "")
-				var current_bus_class = "standard"
-				for b in GameParts.PARTS["bus"]:
-					if b["id"] == current_bus_id:
-						current_bus_class = b.get("class", "standard")
-						break
+				var current_bus_class = _bus_part_class(GameManager.current_design.get("bus", ""))
 				var is_crewed_mission = GameManager.current_design.get("mission", "") == "m_station"
 				
 				for p in full_list:

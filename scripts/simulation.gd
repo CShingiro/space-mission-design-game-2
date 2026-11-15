@@ -62,7 +62,7 @@ static func get_dashboard(design: Dictionary, launch_vehicles: Array) -> Diction
 
 	# --- VALIDATION (Blockers) ---
 	if not orbit.get("id") in mission.get("allowed_orbits", []):
-		issues.append({"severity": "block", "what": "Wrong orbit for mission", "why": "Mission requires %s" % str(mission.allowed_orbits), "fix": "Pick a valid orbit."})
+		issues.append({"severity": "block", "what": "Wrong orbit for mission", "why": "Mission requires %s" % str(mission.get("allowed_orbits", [])), "fix": "Pick a valid orbit."})
 	
 	if not lv.is_empty() and not orbit.get("id") in lv.get("orbits", []):
 		issues.append({"severity": "block", "what": "Rocket can't reach orbit", "why": "%s only supports %s" % [lv.get("name", ""), str(lv.get("orbits", []))], "fix": "Bigger rocket or closer orbit."})
@@ -139,7 +139,9 @@ static func run_mission(design: Dictionary, launch_vehicles: Array) -> Dictionar
 
 	var orbit = GameOrbits.ORBITS.get(design.get("orbit", "leo"))
 	var lv = _find_vehicle(design.get("launch_vehicle", ""), launch_vehicles)
-	var mission = GameMissions.MISSIONS.get(design.get("mission", "m_satellite"))
+	var mission = GameMissions.MISSIONS.get(design.get("mission", "m_satellite"), {})
+	if mission.is_empty():
+		mission = GameMissions.MISSIONS["m_satellite"]
 	var esc = _find_part("escape_system", design.get("escape_system", "esc_none"))
 	var crew = int(design.get("crew", 0))
 	
@@ -155,55 +157,79 @@ static func run_mission(design: Dictionary, launch_vehicles: Array) -> Dictionar
 		return {"status": "Failure", "log": log, "score": 0, "science": 0.0}
 	
 	log.append("Month 0: Launch successful!")
-	var travel = orbit.get("travel_months", 0)
+	var travel = int(orbit.get("travel_months", 0))
+	
+	# Honour the design's planned_months, clamped to at least 1.
+	var planned = int(design.get("planned_months", 12))
+	planned = max(planned, 1)
+	
 	var operated = 0
-	var planned = 12
 	var science = 0.0
+	var months = []  # keep log concise: group identical nominal months
 	
 	# --- MONTH LOOP ---
 	for month in range(1, travel + planned + 1):
 		var op_month = month - travel
-		if op_month <= 0: 
-			if month == travel: log.append("Month %d: Arrived at destination." % month)
+		if op_month <= 0:
+			if month == travel:
+				log.append("Month %d: Arrived at destination." % month)
 			continue
-			
+		
 		var r = randf()
-		if r < 0.02: log.append("Month %d: Solar storm! Systems rebooted." % month)
-		elif r < 0.03: log.append("Month %d: Micrometeoroid hit - power dropped 15%%." % month)
+		if r < 0.02:
+			log.append("Month %d: Solar storm! Systems rebooted." % month)
+		elif r < 0.03:
+			log.append("Month %d: Micrometeoroid hit - power dropped 15%%." % month)
 		
 		var month_sci = 0.0
 		for i in design.get("instruments", []):
-			var ins = _find_part("instruments", i)
+			var ins = _find_part("instruments", str(i))
 			var is_useful = false
 			for t in mission.get("useful_tags", []):
-				if t in ins.get("tags", []): is_useful = true
+				if t in ins.get("tags", []):
+					is_useful = true
+					break
 			month_sci += float(ins.get("science", 0)) * (1.0 if is_useful else 0.25)
 		
-		month_sci *= orbit.get("surface_science_bonus", 1.0)
+		month_sci *= float(orbit.get("surface_science_bonus", 1.0))
 		science += month_sci
 		operated += 1
-		log.append("Month %d: Nominal operations. Science +%.1f" % [month, month_sci])
-
+		# Only log nominal ops for the first month and then every 6 months to avoid spam.
+		if op_month == 1 or op_month % 6 == 0:
+			log.append("Month %d: Nominal operations. Science +%.1f" % [month, month_sci])
+	
 	# --- FINAL OUTCOME ---
-	var met_life = operated >= mission.get("min_lifetime_months", 6)
-	var met_sci = science >= mission.get("target_science", 100)
+	var met_life = operated >= int(mission.get("min_lifetime_months", 6))
+	var met_sci = science >= float(mission.get("target_science", 100))
 	var missing_tags = false
 	for tag in mission.get("required_tags", []):
 		var has_tag = false
 		for i in design.get("instruments", []):
-			if tag in _find_part("instruments", i).get("tags", []): has_tag = true
-		if not has_tag: missing_tags = true
-
+			if tag in _find_part("instruments", str(i)).get("tags", []):
+				has_tag = true
+				break
+		if not has_tag:
+			missing_tags = true
+			break
+	
 	var status = "Failure"
 	if met_life and met_sci and not missing_tags:
 		status = "Full success"
-	elif science >= mission.get("target_science", 100) * 0.5:
+	elif science >= float(mission.get("target_science", 100)) * 0.5:
 		status = "Partial success"
-
-	var score = int(science * 10.0) if status != "Failure" else 0
+	
+	var score = 0
+	if status == "Full success":
+		score = int(science * 10.0)
+	elif status == "Partial success":
+		score = int(science * 5.0)   # partial earns half credit, not zero
+	
 	return {
-		"status": status, "months_operated": operated, "science": science,
-		"score": score, "log": log
+		"status": status,
+		"months_operated": operated,
+		"science": science,
+		"score": score,
+		"log": log
 	}
 
 static func _find_part(category: String, id: String) -> Dictionary:
